@@ -4,7 +4,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-
+const userRoutes = require('./src/routes/userRoutes');
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -17,6 +17,7 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json());
+app.use(userRoutes);
 
 const uri = process.env.DB_URI;
 
