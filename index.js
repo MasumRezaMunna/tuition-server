@@ -7,6 +7,10 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const userRoutes = require('./src/routes/userRoutes');
 const app = express();
 const port = process.env.PORT || 5000;
+const tuitionRoutes = require('./src/routes/tuitionRoutes');
+const User = require('./src/models/User');
+
+
 
 app.use(cors({
     origin: [
@@ -18,6 +22,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(userRoutes);
+app.use(tuitionRoutes);
 
 const uri = process.env.DB_URI;
 
@@ -33,6 +38,19 @@ mongoose.connect(uri)
 app.get('/', (req, res) => {
     res.send('eTuitionBd Server is Running...');
 });
+
+app.get("/users/role/:email", async (req, res) => {
+  try {
+    const email = req.params.email;
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json({ role: user.role });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+});
+
+
 
 app.post('/jwt', async (req, res) => {
     const user = req.body;
