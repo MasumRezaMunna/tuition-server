@@ -1,10 +1,13 @@
 const express = require('express');
-const { createTuition, getMyTuitions } = require('../controllers/tuitionController');
-const { verifyToken } = require('../middlewares/authMiddleware');
+const { createTuition, getMyTuitions, getAllTuitions, updateTuitionStatus } = require('../controllers/tuitionController');
+const { verifyToken, verifyAdmin } = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
 router.post('/tuitions', verifyToken, createTuition);
 router.get('/tuitions/my-tuitions/:email', verifyToken, getMyTuitions);
+
+router.get('/tuitions/all', verifyToken, verifyAdmin, getAllTuitions);
+router.patch('/tuitions/status/:id', verifyToken, verifyAdmin, updateTuitionStatus);
 
 module.exports = router;

@@ -34,15 +34,18 @@ const getAllUsers = async (req, res) => {
 
 const getUserRole = async (req, res) => {
   const email = req.params.email;
-  try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).send({ message: "User not found" });
-    }
-    res.send({ role: user.role });
-  } catch (error) {
-    res.status(500).send({ message: "Error fetching user role" });
+
+  if (req.decoded.email !== email) {
+    return res.status(403).send({ message: 'forbidden access' });
   }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return res.status(404).send({ message: 'User not found' });
+  }
+
+  res.send({ role: user.role });
 };
 
 const updateUserRole = async (req, res) => {

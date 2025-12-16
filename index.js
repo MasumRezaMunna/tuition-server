@@ -39,16 +39,7 @@ app.get('/', (req, res) => {
     res.send('eTuitionBd Server is Running...');
 });
 
-app.get("/users/role/:email", async (req, res) => {
-  try {
-    const email = req.params.email;
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "User not found" });
-    res.json({ role: user.role });
-  } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
-  }
-});
+
 
 
 

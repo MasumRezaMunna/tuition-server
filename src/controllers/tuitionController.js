@@ -27,7 +27,36 @@ const getMyTuitions = async (req, res) => {
     }
 };
 
+
+const getAllTuitions = async (req, res) => {
+    try {
+         const result = await Tuition.find({}).sort({ status: -1, createdAt: -1 });
+        res.send(result);
+    } catch (error) {
+        res.status(500).send({ message: 'Error fetching all tuitions' });
+    }
+};
+
+const updateTuitionStatus = async (req, res) => {
+    const id = req.params.id;
+    const { status } = req.body; 
+
+    const filter = { _id: id };
+    const updateDoc = {
+        $set: { status: status }
+    };
+
+    try {
+        const result = await Tuition.updateOne(filter, updateDoc);
+        res.send(result);
+    } catch (error) {
+        res.status(500).send({ message: 'Error updating status' });
+    }
+};
+
 module.exports = {
     createTuition,
-    getMyTuitions
+    getMyTuitions,
+    getAllTuitions,    
+    updateTuitionStatus 
 };
