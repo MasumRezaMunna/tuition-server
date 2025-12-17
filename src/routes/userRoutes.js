@@ -11,7 +11,7 @@ const { verifyToken, verifyAdmin } = require('../middlewares/authMiddleware');
 const router = express.Router();
 
 router.post('/users', upsertUser);
-router.get('/users/role/:email', verifyToken, getUserRole);
+router.get('/role/:email', verifyToken, getUserRole);
 router.get('/users', verifyToken, verifyAdmin, getAllUsers);
 router.patch('/users/role/:id', verifyToken, verifyAdmin, updateUserRole);
 router.delete('/users/:id', verifyToken, verifyAdmin, deleteUser);

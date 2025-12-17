@@ -53,10 +53,20 @@ const updateTuitionStatus = async (req, res) => {
         res.status(500).send({ message: 'Error updating status' });
     }
 };
+const getApprovedTuitions = async (req, res) => {
+    try {
+        const query = { status: 'approved' };
+        const result = await Tuition.find(query).sort({ createdAt: -1 });
+        res.send(result);
+    } catch (error) {
+        res.status(500).send({ message: 'Error fetching tuitions' });
+    }
+};
 
 module.exports = {
     createTuition,
     getMyTuitions,
     getAllTuitions,    
-    updateTuitionStatus 
+    updateTuitionStatus,
+    getApprovedTuitions
 };

@@ -8,7 +8,6 @@ const userRoutes = require('./src/routes/userRoutes');
 const app = express();
 const port = process.env.PORT || 5000;
 const tuitionRoutes = require('./src/routes/tuitionRoutes');
-const User = require('./src/models/User');
 
 
 
@@ -23,6 +22,7 @@ app.use(cors({
 app.use(express.json());
 app.use(userRoutes);
 app.use(tuitionRoutes);
+app.use("/users", userRoutes);
 
 const uri = process.env.DB_URI;
 
@@ -48,6 +48,33 @@ app.post('/jwt', async (req, res) => {
     const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
     res.send({ token });
 });
+
+app.post('/login', async (req, res) => {
+  const { email, name, photoURL } = req.body;
+
+  try {
+    const filter = { email };
+    const update = {
+      $set: { email, name, photoURL },
+      $setOnInsert: { role: "student" }
+    };
+    const options = { upsert: true, new: true };
+
+    const user = await User.findOneAndUpdate(filter, update, options);
+
+    const token = jwt.sign(
+      { email: user.email, name: user.name, role: user.role },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    res.status(200).send({ token, user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: "Login failed", error: err.message });
+  }
+});
+
 
 app.post('/create-payment-intent', async (req, res) => {
     const { price } = req.body;
