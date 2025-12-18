@@ -62,11 +62,21 @@ const getApprovedTuitions = async (req, res) => {
         res.status(500).send({ message: 'Error fetching tuitions' });
     }
 };
+const getSingleTuition = async (req, res) => {
+    const id = req.params.id;
+    try {
+        const result = await Tuition.findById(id);
+        res.send(result);
+    } catch (error) {
+        res.status(500).send({ message: 'Error fetching tuition details' });
+    }
+};
 
 module.exports = {
     createTuition,
     getMyTuitions,
     getAllTuitions,    
     updateTuitionStatus,
-    getApprovedTuitions
+    getApprovedTuitions,
+    getSingleTuition
 };

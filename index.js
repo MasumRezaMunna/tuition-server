@@ -23,6 +23,7 @@ app.use(express.json());
 app.use(userRoutes);
 app.use(tuitionRoutes);
 app.use("/users", userRoutes);
+app.use(applicationRoutes);
 
 const uri = process.env.DB_URI;
 
