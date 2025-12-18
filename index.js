@@ -14,7 +14,7 @@ const tuitionRoutes = require('./src/routes/tuitionRoutes');
 app.use(cors({
     origin: [
         'http://localhost:5173', 
-        'https://etuition-bd.web.app',
+        'https://glittery-kelpie-e033fe.netlify.app',
         'https://etuition-bd.firebaseapp.com'
     ],
     credentials: true
