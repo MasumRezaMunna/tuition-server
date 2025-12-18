@@ -18,5 +18,6 @@ router.get('/', verifyToken, verifyAdmin, getAllUsers);
 router.patch('/role/:id', verifyToken, verifyAdmin, updateUserRole);
 router.delete('/:id', verifyToken, verifyAdmin, deleteUser);
 router.patch('/users/update/:email', verifyToken, updateProfile);
+router.get('/admin-stats', verifyToken, verifyAdmin, getAdminStats);
 
 module.exports = router;

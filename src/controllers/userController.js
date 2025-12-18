@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Tuition = require('../models/Tuition');
 
 const upsertUser = async (req, res) => {
   const { email, name, phone, photoURL } = req.body;
@@ -109,11 +110,38 @@ const updateProfile = async (req, res) => {
     }
 };
 
+const getAdminStats = async (req, res) => {
+    try {
+        const usersCount = await User.countDocuments();
+        const tuitionCount = await Tuition.countDocuments();
+        
+        
+        const studentCount = await User.countDocuments({ role: 'student' });
+        const tutorCount = await User.countDocuments({ role: 'tutor' });
+        
+        
+        const approvedTuitions = await Tuition.countDocuments({ status: 'approved' });
+        const pendingTuitions = await Tuition.countDocuments({ status: 'pending' });
+
+        res.send({
+            usersCount,
+            tuitionCount,
+            studentCount,
+            tutorCount,
+            approvedTuitions,
+            pendingTuitions
+        });
+    } catch (error) {
+        res.status(500).send({ message: 'Error fetching stats' });
+    }
+};
+
 module.exports = {
   upsertUser,
   getAllUsers,
   getUserRole,
   updateUserRole,
   deleteUser,
-  updateProfile
+  updateProfile,
+  getAdminStats
 };
