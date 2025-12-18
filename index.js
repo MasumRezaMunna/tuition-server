@@ -16,7 +16,7 @@ app.use(cors({
   origin: [
     'http://localhost:5173',
     'https://etuition-bd.web.app',
-    'https://glittery-kelpie-e033fe.netlify.app'
+    'https://venerable-quokka-b8c38c.netlify.app'
   ],
   credentials: true
 }));
