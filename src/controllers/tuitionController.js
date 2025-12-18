@@ -1,82 +1,86 @@
 const Tuition = require('../models/Tuition');
 
 const createTuition = async (req, res) => {
-    try {
-        const newTuition = req.body;
-        newTuition.status = 'pending'; 
-        
-        const result = await Tuition.create(newTuition);
-        res.status(200).send(result);
-    } catch (error) {
-        res.status(500).send({ message: 'Error creating tuition post', error: error.message });
-    }
+  try {
+    const tuition = {
+      ...req.body,
+      studentEmail: req.decoded.email,
+      status: 'pending'
+    };
+
+    const result = await Tuition.create(tuition);
+    res.status(201).send(result);
+  } catch (error) {
+    res.status(500).send({ message: 'Failed to create tuition' });
+  }
 };
 
 const getMyTuitions = async (req, res) => {
-    const email = req.params.email;
-    
-    if (req.decoded.email !== email) {
-        return res.status(403).send({ message: 'forbidden access' });
-    }
-    
-    try {
-        const result = await Tuition.find({ studentEmail: email }).sort({ createdAt: -1 });
-        res.send(result);
-    } catch (error) {
-        res.status(500).send({ message: 'Error fetching tuitions' });
-    }
+  try {
+    const result = await Tuition.find({
+      studentEmail: req.decoded.email
+    }).sort({ createdAt: -1 });
+
+    res.send(result);
+  } catch {
+    res.status(500).send({ message: 'Failed to fetch tuitions' });
+  }
 };
 
-
 const getAllTuitions = async (req, res) => {
-    try {
-         const result = await Tuition.find({}).sort({ status: -1, createdAt: -1 });
-        res.send(result);
-    } catch (error) {
-        res.status(500).send({ message: 'Error fetching all tuitions' });
-    }
+  try {
+    const result = await Tuition.find().sort({
+      status: 1,
+      createdAt: -1
+    });
+    res.send(result);
+  } catch {
+    res.status(500).send({ message: 'Failed to fetch all tuitions' });
+  }
 };
 
 const updateTuitionStatus = async (req, res) => {
-    const id = req.params.id;
-    const { status } = req.body; 
+  const { status } = req.body;
 
-    const filter = { _id: id };
-    const updateDoc = {
-        $set: { status: status }
-    };
+  if (!['pending', 'approved', 'rejected'].includes(status)) {
+    return res.status(400).send({ message: 'Invalid status' });
+  }
 
-    try {
-        const result = await Tuition.updateOne(filter, updateDoc);
-        res.send(result);
-    } catch (error) {
-        res.status(500).send({ message: 'Error updating status' });
-    }
+  try {
+    const result = await Tuition.updateOne(
+      { _id: req.params.id },
+      { $set: { status } }
+    );
+    res.send(result);
+  } catch {
+    res.status(500).send({ message: 'Status update failed' });
+  }
 };
+
 const getApprovedTuitions = async (req, res) => {
-    try {
-        const query = { status: 'approved' };
-        const result = await Tuition.find(query).sort({ createdAt: -1 });
-        res.send(result);
-    } catch (error) {
-        res.status(500).send({ message: 'Error fetching tuitions' });
-    }
+  try {
+    const result = await Tuition.find({ status: 'approved' })
+      .sort({ createdAt: -1 });
+    res.send(result);
+  } catch {
+    res.status(500).send({ message: 'Failed to fetch tuitions' });
+  }
 };
+
 const getSingleTuition = async (req, res) => {
-    const id = req.params.id;
-    try {
-        const result = await Tuition.findById(id);
-        res.send(result);
-    } catch (error) {
-        res.status(500).send({ message: 'Error fetching tuition details' });
-    }
+  try {
+    const result = await Tuition.findById(req.params.id);
+    res.send(result);
+  } catch {
+    res.status(500).send({ message: 'Failed to fetch tuition' });
+  }
 };
 
 module.exports = {
-    createTuition,
-    getMyTuitions,
-    getAllTuitions,    
-    updateTuitionStatus,
-    getApprovedTuitions,
-    getSingleTuition
+  createTuition,
+  getMyTuitions,
+  getAllTuitions,
+  updateTuitionStatus,
+  getApprovedTuitions,
+  getSingleTuition
 };

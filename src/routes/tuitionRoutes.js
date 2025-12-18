@@ -1,14 +1,26 @@
 const express = require('express');
-const { createTuition, getMyTuitions, getAllTuitions, updateTuitionStatus, getApprovedTuitions } = require('../controllers/tuitionController');
+const {
+  createTuition,
+  getMyTuitions,
+  getAllTuitions,
+  updateTuitionStatus,
+  getApprovedTuitions,
+  getSingleTuition
+} = require('../controllers/tuitionController');
 const { verifyToken, verifyAdmin } = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
-router.post('/tuitions', verifyToken, createTuition);
-router.get('/tuitions/my-tuitions/:email', verifyToken, getMyTuitions);
+/* student */
+router.post('/', verifyToken, createTuition);
+router.get('/my-tuitions', verifyToken, getMyTuitions);
 
-router.get('/tuitions/all', verifyToken, verifyAdmin, getAllTuitions);
-router.patch('/tuitions/status/:id', verifyToken, verifyAdmin, updateTuitionStatus);
-router.get('/tuitions', getApprovedTuitions);
+/* admin */
+router.get('/all', verifyToken, verifyAdmin, getAllTuitions);
+router.patch('/status/:id', verifyToken, verifyAdmin, updateTuitionStatus);
+
+/* public */
+router.get('/', getApprovedTuitions);
+router.get('/:id', getSingleTuition);
+
 module.exports = router;
-router.get('/tuitions/:id', getSingleTuition);

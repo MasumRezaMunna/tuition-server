@@ -1,77 +1,86 @@
 const User = require("../models/User");
 
 const upsertUser = async (req, res) => {
-  const { email, name, role, phone, photoURL } = req.body;
-
-  const defaultRole = role || "student";
+  const { email, name, phone, photoURL } = req.body;
 
   const filter = { email };
   const update = {
-    $set: { email, name, photoURL },
-    $setOnInsert: { role: defaultRole },
+    $set: { name, phone, photoURL },
+    $setOnInsert: { role: "student" }
   };
-  const options = { upsert: true, new: true };
 
   try {
-    const result = await User.findOneAndUpdate(filter, update, options);
-    res.status(200).send({ message: "User saved successfully", user: result });
+    const user = await User.findOneAndUpdate(filter, update, {
+      upsert: true,
+      new: true
+    });
+
+    res.status(201).send({ message: "User saved", user });
   } catch (error) {
-    console.error("Error saving user:", error);
-    res
-      .status(500)
-      .send({ message: "Error saving user data", error: error.message });
+    res.status(500).send({ message: "User save failed" });
   }
 };
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({});
-    res.status(200).send(users);
-  } catch (error) {
+    const users = await User.find(
+      {},
+      "name email role accountStatus photoURL createdAt"
+    );
+    res.send(users);
+  } catch {
     res.status(500).send({ message: "Failed to fetch users" });
   }
 };
 
 const getUserRole = async (req, res) => {
-  const email = req.params.email;
+  try {
+    const email = req.decoded.email;
+    const user = await User.findOne({ email });
 
-  if (req.decoded.email !== email) {
-    return res.status(403).send({ message: 'forbidden access' });
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    res.send({ role: user.role });
+  } catch {
+    res.status(500).send({ message: "Failed to get role" });
   }
-
-  const user = await User.findOne({ email });
-
-  if (!user) {
-    return res.status(404).send({ message: 'User not found' });
-  }
-
-  res.send({ role: user.role });
 };
 
 const updateUserRole = async (req, res) => {
-  const id = req.params.id;
+  const { id } = req.params;
   const { role } = req.body;
 
-  const filter = { _id: id };
-  const updateDoc = {
-    $set: { role: role },
-  };
-
   try {
-    const result = await User.updateOne(filter, updateDoc);
+    const result = await User.updateOne(
+      { _id: id },
+      { $set: { role, roleUpdatedAt: new Date() } }
+    );
     res.send(result);
-  } catch (error) {
-    res.status(500).send({ message: "Error updating role" });
+  } catch {
+    res.status(500).send({ message: "Role update failed" });
   }
 };
 
 const deleteUser = async (req, res) => {
-  const id = req.params.id;
+  const { id } = req.params;
+
   try {
-    const result = await User.findByIdAndDelete(id);
-    res.send(result);
-  } catch (error) {
-    res.status(500).send({ message: "Error deleting user" });
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    if (user.email === req.decoded.email) {
+      return res.status(400).send({ message: "Cannot delete own account" });
+    }
+
+    await User.findByIdAndDelete(id);
+    res.send({ message: "User deleted" });
+  } catch {
+    res.status(500).send({ message: "Delete failed" });
   }
 };
 
@@ -80,5 +89,5 @@ module.exports = {
   getAllUsers,
   getUserRole,
   updateUserRole,
-  deleteUser,
+  deleteUser
 };
