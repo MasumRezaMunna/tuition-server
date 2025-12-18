@@ -95,3 +95,10 @@ app.post('/create-payment-intent', async (req, res) => {
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
+
+const cors = require('cors');
+
+app.use(cors({
+    origin: ["http://localhost:5173", "https://etuition-bd.web.app", "https://etuition.vercel.app"],
+    credentials: true
+}));
