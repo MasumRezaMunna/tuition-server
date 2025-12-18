@@ -84,10 +84,36 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const updateProfile = async (req, res) => {
+    const email = req.params.email;
+    const updatedData = req.body;
+    
+    if (req.decoded.email !== email) {
+        return res.status(403).send({ message: 'forbidden access' });
+    }
+
+    const filter = { email: email };
+    const updateDoc = {
+        $set: {
+            name: updatedData.name,
+            phone: updatedData.phone,
+            photoURL: updatedData.photoURL
+        }
+    };
+
+    try {
+        const result = await User.updateOne(filter, updateDoc);
+        res.send(result);
+    } catch (error) {
+        res.status(500).send({ message: 'Error updating profile' });
+    }
+};
+
 module.exports = {
   upsertUser,
   getAllUsers,
   getUserRole,
   updateUserRole,
-  deleteUser
+  deleteUser,
+  updateProfile
 };
