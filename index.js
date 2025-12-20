@@ -15,8 +15,8 @@ const app = express();
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    'https://tuition-client-five.vercel.app/',
-    'https://fascinating-pavlova-390b2e.netlify.app/'
+    'https://tuition-client-five.vercel.app',
+    'https://fascinating-pavlova-390b2e.netlify.app'
   ],
   credentials: true
 }));
