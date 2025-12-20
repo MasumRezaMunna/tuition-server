@@ -4,7 +4,9 @@ const {
   getAllUsers,
   getUserRole,
   updateUserRole,
-  deleteUser
+  deleteUser,
+  updateProfile,
+  getAdminStats
 } = require('../controllers/userController');
 const { verifyToken, verifyAdmin } = require('../middlewares/authMiddleware');
 
@@ -17,7 +19,7 @@ router.get('/role', verifyToken, getUserRole);
 router.get('/', verifyToken, verifyAdmin, getAllUsers);
 router.patch('/role/:id', verifyToken, verifyAdmin, updateUserRole);
 router.delete('/:id', verifyToken, verifyAdmin, deleteUser);
-router.patch('/users/update/:email', verifyToken, updateProfile);
+router.patch('/update/:email', verifyToken, updateProfile);
 router.get('/admin-stats', verifyToken, verifyAdmin, getAdminStats);
 
 module.exports = router;
