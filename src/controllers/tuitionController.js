@@ -59,30 +59,10 @@ const updateTuitionStatus = async (req, res) => {
 
 const getApprovedTuitions = async (req, res) => {
   try {
-    const { search, location, sort, page = 1, limit = 6, tuitionClass } = req.query;
-    let query = { status: 'approved' };
-
-    if (search) {
-      query.subject = { $regex: search, $options: 'i' }; 
-    }
-    if (location) {
-      query.location = { $regex: location, $options: 'i' }; 
-    }
-    if (tuitionClass) {
-      query.class = tuitionClass; 
-    }
-
-    const skip = (parseInt(page) - 1) * parseInt(limit);
-
-    const result = await Tuition.find(query)
-      .sort({ budget: sort === 'asc' ? 1 : -1 })
-      .skip(skip)
-      .limit(parseInt(limit));
-
-    const total = await Tuition.countDocuments(query);
-
-    res.send({ result, total });
-  } catch (error) {
+    const result = await Tuition.find({ status: 'approved' })
+      .sort({ createdAt: -1 });
+    res.send(result);
+  } catch {
     res.status(500).send({ message: 'Failed to fetch tuitions' });
   }
 };
